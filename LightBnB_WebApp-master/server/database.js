@@ -118,31 +118,33 @@ const getAllProperties = function(options, limit = 10) {
     // add where 
     // build the where clauses - A1 = [a,b,c] => A1.join(' AND ') => a $ b $ c
 
+const whereArray = [];
 
-
-  if(Object.keys(options).length !== 0){
-  queryString += `
-  WHERE 
-  `;}
+ 
  
  // 3
  if (options.city) {
    queryParams.push(`%${options.city}%`);
-   queryString += ` city LIKE $${queryParams.length} `;
+   whereArray.push (`city LIKE $${queryParams.length}`);
  }
  // p = 10
   if(options.minimum_price_per_night){
   queryParams.push(options.minimum_price_per_night * 100);
-  queryString += `cost_per_night >= $${queryParams.length} `
+  whereArray.push( `cost_per_night >= $${queryParams.length} `);
  }
   if(options.maximum_price_per_night){
   queryParams.push(options.maximum_price_per_night * 100);
-  queryString += `cost_per_night <= $${queryParams.length} `
+  whereArray.push( ` cost_per_night <= $${queryParams.length} `);
  }
  if(options.owner_id){
   queryParams.push(options.owner_id);
-  queryString += `owner_id = $${queryParams.length} `
+  whereArray.push( ` owner_id = $${queryParams.length} `);
  }
+
+ if(Object.keys(options).length !== 0){
+  queryString += `
+  WHERE ${whereArray.join(' AND ')}
+  `;}
  
  queryString += `
  GROUP BY properties.id `
